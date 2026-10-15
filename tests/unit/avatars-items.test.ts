@@ -107,6 +107,14 @@ describe('concept assets', () => {
     assert.equal(new Set(CONCEPT_PROPS.map((p) => p.key)).size, 71);
   });
 
+  it('turned bench views are exact mirrors of the correctly drawn views', () => {
+    const by = (k: string) => CONCEPT_PROPS.find((p) => p.key === k)!;
+    assert.equal(by('bench-r90').mirrorOf, 'bench-r0');
+    assert.equal(by('bench-r270').mirrorOf, 'bench-r180');
+    assert.equal(by('bench-r90').width, by('bench-r0').width);
+    assert.equal(by('bench-r270').height, by('bench-r180').height);
+  });
+
   it('concept art can never be registered as a sprite atlas', () => {
     const issues = validateManifest({
       version: 1,

@@ -113,7 +113,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    230
   ],
   "atlas": [
-   233,
+   231,
    116,
    46,
    73
@@ -159,7 +159,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    258
   ],
   "atlas": [
-   524,
+   522,
    116,
    76,
    71
@@ -274,7 +274,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    419
   ],
   "atlas": [
-   922,
+   920,
    116,
    64,
    67
@@ -435,7 +435,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    415
   ],
   "atlas": [
-   744,
+   824,
    192,
    63,
    60
@@ -527,7 +527,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    401
   ],
   "atlas": [
-   809,
+   889,
    192,
    26,
    60
@@ -550,7 +550,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    568
   ],
   "atlas": [
-   378,
+   376,
    116,
    27,
    72
@@ -573,7 +573,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    573
   ],
   "atlas": [
-   407,
+   405,
    116,
    29,
    72
@@ -596,7 +596,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    573
   ],
   "atlas": [
-   438,
+   436,
    116,
    29,
    72
@@ -619,7 +619,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    577
   ],
   "atlas": [
-   706,
+   704,
    116,
    27,
    69
@@ -642,7 +642,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    579
   ],
   "atlas": [
-   281,
+   279,
    116,
    31,
    73
@@ -711,7 +711,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    578
   ],
   "atlas": [
-   602,
+   600,
    116,
    47,
    70
@@ -734,7 +734,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    583
   ],
   "atlas": [
-   314,
+   312,
    116,
    62,
    73
@@ -803,7 +803,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    718
   ],
   "atlas": [
-   804,
+   802,
    116,
    56,
    68
@@ -895,7 +895,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    707
   ],
   "atlas": [
-   919,
+   917,
    192,
    35,
    59
@@ -964,7 +964,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    723
   ],
   "atlas": [
-   862,
+   860,
    116,
    58,
    68
@@ -1033,7 +1033,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    719
   ],
   "atlas": [
-   735,
+   733,
    116,
    67,
    69
@@ -1079,7 +1079,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    860
   ],
   "atlas": [
-   589,
+   669,
    192,
    63,
    61
@@ -1102,7 +1102,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    854
   ],
   "atlas": [
-   654,
+   734,
    192,
    43,
    61
@@ -1332,7 +1332,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    1007
   ],
   "atlas": [
-   651,
+   649,
    116,
    53,
    70
@@ -1424,7 +1424,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    1007
   ],
   "atlas": [
-   699,
+   779,
    192,
    43,
    61
@@ -1447,7 +1447,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    1008
   ],
   "atlas": [
-   956,
+   954,
    192,
    65,
    59
@@ -1493,7 +1493,7 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
    1012
   ],
   "atlas": [
-   469,
+   467,
    116,
    53,
    72
@@ -1569,29 +1569,6 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
   ]
  },
  {
-  "id": "concept.props.bench-r90",
-  "group": "props",
-  "category": "street",
-  "categoryLabel": "Katukalusteet",
-  "key": "bench-r90",
-  "label": "Penkki (istuin ↘)",
-  "file": "concept/props/bench-r90.png",
-  "width": 80,
-  "height": 74,
-  "sourceBox": [
-   434,
-   6,
-   760,
-   308
-  ],
-  "atlas": [
-   151,
-   116,
-   80,
-   74
-  ]
- },
- {
   "id": "concept.props.bench-r180",
   "group": "props",
   "category": "street",
@@ -1615,6 +1592,30 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
   ]
  },
  {
+  "id": "concept.props.bench-r90",
+  "group": "props",
+  "category": "street",
+  "categoryLabel": "Katukalusteet",
+  "key": "bench-r90",
+  "label": "Penkki (istuin ↘)",
+  "file": "concept/props/bench-r90.png",
+  "width": 78,
+  "height": 74,
+  "sourceBox": [
+   65,
+   6,
+   385,
+   310
+  ],
+  "mirrorOf": "bench-r0",
+  "atlas": [
+   151,
+   116,
+   78,
+   74
+  ]
+ },
+ {
   "id": "concept.props.bench-r270",
   "group": "props",
   "category": "street",
@@ -1622,19 +1623,20 @@ export const CONCEPT_PROPS: ConceptPropInfo[] = [
   "key": "bench-r270",
   "label": "Penkki (istuin ↖, selkä näkyy)",
   "file": "concept/props/bench-r270.png",
-  "width": 80,
-  "height": 60,
+  "width": 78,
+  "height": 62,
   "sourceBox": [
-   784,
-   306,
-   1114,
-   556
+   63,
+   286,
+   385,
+   541
   ],
+  "mirrorOf": "bench-r180",
   "atlas": [
-   837,
+   589,
    192,
-   80,
-   60
+   78,
+   62
   ]
  }
 ];

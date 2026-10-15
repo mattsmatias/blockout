@@ -60,6 +60,8 @@ def measure_props() -> None:
         sheet = sheets["bench"] if e["key"].startswith("bench-r") else sheets["v2"]
         x0, y0, x1, y1 = e["sourceBox"]
         crop = sheet[y0:y1, x0:x1]
+        if e.get("mirrorOf"):
+            crop = cv2.flip(crop, 1)  # this view is the mirror image of another
         gray = cv2.cvtColor(crop[..., :3], cv2.COLOR_BGR2GRAY)
         gray[crop[..., 3] <= 110] = 0
         c = edge_angles(gray, 40)

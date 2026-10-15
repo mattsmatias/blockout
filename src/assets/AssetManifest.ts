@@ -44,6 +44,8 @@ export interface ConceptPropInfo {
   sourceBox: number[];
   /** [x, y, w, h] inside PROPS_ATLAS. */
   atlas: number[];
+  /** Set when this view is the horizontal mirror of another view (key). */
+  mirrorOf?: string;
 }
 
 export interface AssetEntry {

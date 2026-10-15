@@ -139,11 +139,20 @@ EXTRA_SOURCES = [
         0.25,  # the bench is drawn ~320 px wide here vs ~150 px on sheet v2
         [
             ("bench-r0", "Penkki (istuin ↙)", "street", "Katukalusteet", (65, 6, 385, 310)),
-            ("bench-r90", "Penkki (istuin ↘)", "street", "Katukalusteet", (434, 6, 760, 308)),
+            # ↘ and ↖ views are mirror images of ↙ and ↗ (see MIRRORED below): the sheet's own
+            # ↘/↖ drawings were ~1.5° too shallow (28.3°/28.5° vs 30°).
             ("bench-r180", "Penkki (istuin ↗, selkä näkyy)", "street", "Katukalusteet", (63, 286, 385, 541)),
-            ("bench-r270", "Penkki (istuin ↖, selkä näkyy)", "street", "Katukalusteet", (784, 306, 1114, 556)),
         ],
     ),
+]
+
+# Views produced by mirroring another view horizontally. With the camera's fixed
+# 45° yaw, a left-right mirror on screen swaps world X and Z, so a symmetric prop
+# turned 90° is exactly the mirror image of the unturned one — same pixels, same
+# edge angles, no resampling. (Highlights move to the other side, as in a mirror.)
+MIRRORED = [
+    ("bench-r90", "Penkki (istuin ↘)", "bench-r0"),
+    ("bench-r270", "Penkki (istuin ↖, selkä näkyy)", "bench-r180"),
 ]
 
 
@@ -243,6 +252,14 @@ def main() -> None:
                 }
             )
             tiles.append(small)
+
+    for key, name, source in MIRRORED:
+        i = next(n for n, e in enumerate(entries) if e["key"] == source)
+        img = tiles[i].transpose(Image.FLIP_LEFT_RIGHT)
+        img.save(CROPS / f"{key}.png", optimize=True)
+        entries.append({**entries[i], "id": f"concept.props.{key}", "key": key, "label": name,
+                        "file": f"concept/props/{key}.png", "mirrorOf": source})
+        tiles.append(img)
 
     # Shelf-pack into one atlas, tallest first.
     order = sorted(range(len(tiles)), key=lambda i: -tiles[i].height)
