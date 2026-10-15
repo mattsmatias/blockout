@@ -30,7 +30,7 @@ Määritelty yhdessä paikassa: `src/utils/CoordinateUtils.ts` ja `src/core/Conf
 - **World**: metrit. X = itä (ruudulla oikealle alas), Y = ylös, Z = etelä (ruudulla vasemmalle alas). Liike XZ-tasossa.
 - **Tile**: 1 tile = 1 m. Tile (tx, tz) kattaa [tx, tx+1) × [tz, tz+1).
 - **Screen**: CSS-pikselit, origo vasen yläkulma.
-- **Art pixel**: render targetin pikseli. 1 tile = 64 × 32 px timantti (kamera: yaw 45°, korkeuskulma 30°).
+- **Art pixel**: render targetin pikseli. 1 tile = 64 × 36,95 px timantti (kamera: yaw 45°, korkeuskulma ≈ 35,26° = true isometric, lattian reunat 30°). Ks. kohta "Isometrinen kulma".
 - **Collision**: sama kuin world XZ. Ei koskaan pikseliyksiköitä.
 - **Sprite anchor**: (M2) jalkojen ankkuripiste framessa → asetetaan tarkalleen entiteetin world-sijaintiin.
 
@@ -64,3 +64,15 @@ Kartta on dataa, josta sekä törmäykset että grafiikka rakennetaan erikseen.
 3. **Zoom-taso mobiilissa** — `MIN_ART_PIXELS_SHORT_SIDE = 360` on arvaus; testattava oikeilla puhelimilla (pystyasennossa näkymä on kapea).
 4. **Seinien häivytys** — vaatii rakennusten jakamisen osiin (seinä/katto/kerros) M3:ssa.
 5. **Suorituskyky** — mitattu vain headless-selaimessa ohjelmistorenderöinnillä; oikea laitetestaus puuttuu.
+
+## Isometrinen kulma (muutettu)
+
+Alun perin käytössä oli 2:1-dimetria (korkeuskulma 30°, lattian reunat 26,57°, tile 64 × 32).
+Kaikki BLOCKOUTin assettiarkit on kuitenkin piirretty **true isometric** -kulmassa: reunat 28–31°,
+keskiarvo 29,6° (`python tools/measure_iso_angles.py props`). Ero näkyi esineiden vinoutena lattiaan
+nähden. Projektio vaihdettiin vastaamaan taidetta (`src/core/Config.ts`, yksi vakio), eikä assetteja
+venytetä tai vinouteta.
+
+Assettien vaatimus jatkossa: lattian suuntaiset reunat 30° vaakatasosta (tile ≈ 64 × 37 px),
+pystyreunat pystysuoria, läpinäkyvä tausta, sama mittakaava kaikissa kuvissa, ja kääntyville esineille
+neljä isometristä näkymää (istuin/etupuoli ↙, ↘, ↗, ↖).

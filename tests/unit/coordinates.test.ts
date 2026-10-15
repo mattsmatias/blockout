@@ -27,7 +27,7 @@ describe('coordinate system', () => {
     assert.ok(u.y > 0, 'screen-up must point upward in world');
   });
 
-  it('a 1×1 ground tile projects to the configured 2:1 diamond', () => {
+  it('a 1×1 ground tile projects to the configured diamond', () => {
     // Diamond corners: (0,0) (1,0) (1,1) (0,1)
     const pts = [
       [0, 0],
@@ -39,6 +39,15 @@ describe('coordinate system', () => {
     const ys = pts.map((p) => p.py);
     close(Math.max(...xs) - Math.min(...xs), PROJECTION.TILE_PIXEL_WIDTH, 1e-6);
     close(Math.max(...ys) - Math.min(...ys), PROJECTION.TILE_PIXEL_HEIGHT, 1e-6);
+  });
+
+  it('ground edges run at 30° on screen (true isometric, matches the art sheets)', () => {
+    const ex = worldOffsetToArtPixels(1, 0, 0);
+    const ez = worldOffsetToArtPixels(0, 0, 1);
+    const deg = (a: { px: number; py: number }) => (Math.atan2(Math.abs(a.py), Math.abs(a.px)) * 180) / Math.PI;
+    close(deg(ex), 30, 1e-9);
+    close(deg(ez), 30, 1e-9);
+    close(PROJECTION.GROUND_EDGE_ANGLE_DEG, 30, 1e-9);
   });
 
   it('+X goes screen lower-right, +Z goes screen lower-left, +Y goes up', () => {

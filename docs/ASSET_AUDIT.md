@@ -30,9 +30,9 @@ Kaikki on merkitty manifestiin tilalla `concept`. Validointi estää konseptikuv
 ## Mack-spriteatlaksen tilauspohja (Milestone 2)
 
 - **Frame:** 128 × 128 px, läpinäkyvä tausta, ei antialiasointia reunoilla.
-- **Hahmon korkeus:** n. 72–80 px (≈1,6 m kun tile on 64 × 32).
+- **Hahmon korkeus:** n. 72–80 px (≈1,6 m kun tile on 64 × 37).
 - **Jalka-ankkuri:** sama pikseli kaikissa frameissa, x = 64, y = 112 (jalkojen keskikohta maassa).
-- **Suunnat (8):** S, SW, W, NW, N, NE, E, SE. Kamera katsoo 30° kulmassa (2:1-isometria).
+- **Suunnat (8):** S, SW, W, NW, N, NE, E, SE. Kamera on true isometric: korkeuskulma ≈ 35,26°, lattian reunat 30° (tile ≈ 64 × 37 px).
 - **Animaatiot ja framet:**
   - idle 4 framea, 6 fps
   - walk 8 framea, 10 fps
@@ -43,3 +43,12 @@ Kaikki on merkitty manifestiin tilalla `concept`. Validointi estää konseptikuv
 
 Vaihtoehto: kaikki 12 hahmoa samalla rungolla (`blocky-v1`) 3D-mallina, joka renderöidään pikselitaiteeksi (vaihtoehto B).
 Tämä poistaa 8 suunnan piirtotyön ja takaa yhtenäisen koon, mutta vaatii hyväksynnän tyylille.
+
+## Esineiden (props) tekniset vaatimukset
+
+- Projektio: true isometric. Lattian suuntaiset reunat **30°** vaakatasosta, pystyreunat pystysuoria.
+  Tarkistus: `python tools/measure_iso_angles.py props` (tavoite 30° ± 1°).
+- Läpinäkyvä tausta, ei hehkuja tai varjoja kuvan reunoilla.
+- Sama mittakaava kaikissa kuvissa: pelissä 1 m vaakasuunnassa ≈ 45 art-pikseliä (tile-timantin leveys 64 px).
+- Kääntyvät esineet: neljä isometristä näkymää samasta mallista (etupuoli ↙, ↘, ↗, ↖).
+  Suorat edestä/sivulta/ylhäältä-kuvat eivät näy tässä kamerassa, niitä ei tarvita.

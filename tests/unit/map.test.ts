@@ -95,10 +95,10 @@ describe('prop rotations', () => {
   it('90° and 270° swap the footprint; every bench rotation has its own sprite', async () => {
     const { PROP_DEFS, resolveProp } = await import('../../src/world/props/PropCatalog');
     const bench = PROP_DEFS['bench']!;
-    assert.deepEqual(resolveProp(bench, 0), { sprite: 'bench-r0', footprint: [1.6, 0.7] });
-    assert.deepEqual(resolveProp(bench, 90), { sprite: 'bench-r90', footprint: [0.7, 1.6] });
+    assert.deepEqual(resolveProp(bench, 0), { sprite: 'bench-r0', footprint: [1.7, 0.75] });
+    assert.deepEqual(resolveProp(bench, 90), { sprite: 'bench-r90', footprint: [0.75, 1.7] });
     assert.deepEqual(resolveProp(bench, 180)!.sprite, 'bench-r180');
-    assert.deepEqual(resolveProp(bench, 270)!.footprint, [0.7, 1.6]);
+    assert.deepEqual(resolveProp(bench, 270)!.footprint, [0.75, 1.7]);
   });
 
   it('rejects a rotation the prop has no picture for', async () => {
@@ -110,6 +110,6 @@ describe('prop rotations', () => {
   it('rotated bench collision follows the rotated footprint', () => {
     const w = new World({ ...DEV_TEST_MAP, props: [{ prop: 'bench', x: 24, z: 27, rot: 90 }] });
     assert.equal(w.collision.overlaps(24, 27.7, 0.05), true); // along Z: inside
-    assert.equal(w.collision.overlaps(24.6, 27, 0.05), false); // along X: outside 0.35 half-width
+    assert.equal(w.collision.overlaps(24.6, 27, 0.05), false); // along X: outside 0.375 half-width
   });
 });

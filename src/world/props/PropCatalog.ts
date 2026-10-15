@@ -47,7 +47,8 @@ export const PROP_DEFS: Record<string, PropDef> = Object.fromEntries([
       rotations: { 90: 'bench-r90', 180: 'bench-r180', 270: 'bench-r270' },
       name: 'Penkki (4 suuntaa)',
       scale: 1,
-      footprint: [1.6, 0.7],
+      // Matches the drawn base: sprite width 78 px ≈ (1.7 + 0.75) × 32 px.
+      footprint: [1.7, 0.75],
       solid: true,
     },
   ] as const,

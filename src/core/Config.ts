@@ -22,18 +22,29 @@ export const FIXED_DT = 1 / SIMULATION.TICK_RATE;
  * Isometric projection.
  *
  * World: X right/east, Y up, Z south (toward the viewer). 1 world unit = 1 tile = 1 metre.
- * The camera looks down the (-1, -h, -1) diagonal: yaw 45°, elevation 30°.
- * Elevation 30° gives the classic 2:1 pixel-art diamond (sin 30° = 0.5).
+ * The camera looks down the (-1, -h, -1) diagonal: yaw 45°.
+ *
+ * Elevation = TRUE ISOMETRIC (atan(1/√2) ≈ 35.264°): ground edges run at 30° on screen
+ * and a tile is a 64 × 36.95 px diamond (√3 : 1). This matches the art direction —
+ * every BLOCKOUT asset sheet is drawn with 28–31° edges (measured with
+ * tools/measure_iso_angles.py). The previous 30° elevation gave 2:1 tiles
+ * (26.57° edges), which made all props look tilted against the floor.
  */
+const TRUE_ISO_ELEVATION_DEG = (Math.atan(1 / Math.SQRT2) * 180) / Math.PI;
+const TILE_PIXEL_WIDTH = 64;
+
 export const PROJECTION = {
   YAW_DEG: 45,
-  ELEVATION_DEG: 30,
+  ELEVATION_DEG: TRUE_ISO_ELEVATION_DEG,
   /**
    * Base pixels per world unit along the screen horizontal at zoom 1.
    * A 1×1 tile then projects to a TILE_PIXEL_WIDTH × TILE_PIXEL_HEIGHT diamond.
    */
-  TILE_PIXEL_WIDTH: 64,
-  TILE_PIXEL_HEIGHT: 32,
+  TILE_PIXEL_WIDTH,
+  /** Derived: width × sin(elevation) ≈ 36.95 px. */
+  TILE_PIXEL_HEIGHT: TILE_PIXEL_WIDTH * Math.sin((TRUE_ISO_ELEVATION_DEG * Math.PI) / 180),
+  /** Screen angle of ground edges, degrees (30° for true isometric). */
+  GROUND_EDGE_ANGLE_DEG: (Math.atan(Math.sin((TRUE_ISO_ELEVATION_DEG * Math.PI) / 180)) * 180) / Math.PI,
 } as const;
 
 /** Derived: world units → art pixels along the camera's right axis. */

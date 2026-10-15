@@ -5,7 +5,7 @@ import { CameraRig } from './CameraRig';
 
 /**
  * three.js adapter for CameraRig: a true orthographic camera with a fixed
- * isometric orientation (yaw 45°, elevation 30° → 2:1 pixel diamonds).
+ * true-isometric orientation (yaw 45°, elevation ≈35.26° → 30° ground edges, see Config).
  * The rig owns all logic; this class only mirrors it into a THREE camera.
  */
 export class IsometricCamera {
