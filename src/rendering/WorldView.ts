@@ -176,7 +176,18 @@ export class WorldView {
     this.debug.grid.add(this.lines(cp, 0xffd400, 'debug-chunks'));
     // Colliders.
     const kp: number[] = [];
-    for (const b of this.world.collision.boxes) rect(kp, b.minX, b.minZ, b.maxX, b.maxZ, 0.03);
+    for (const b of this.world.collision.boxes) {
+      if (!b.circle) {
+        rect(kp, b.minX, b.minZ, b.maxX, b.maxZ, 0.03);
+        continue;
+      }
+      const { x, z, r } = b.circle;
+      for (let i = 0; i < 16; i++) {
+        const a0 = (i / 16) * Math.PI * 2;
+        const a1 = ((i + 1) / 16) * Math.PI * 2;
+        kp.push(x + Math.cos(a0) * r, 0.03, z + Math.sin(a0) * r, x + Math.cos(a1) * r, 0.03, z + Math.sin(a1) * r);
+      }
+    }
     this.debug.colliders.add(this.lines(kp, 0xff3b6b, 'debug-colliders'));
     // Play + camera-visible bounds.
     const bp: number[] = [];
@@ -190,8 +201,10 @@ export class WorldView {
   private lines(points: number[], color: number, name: string): THREE.LineSegments {
     const geo = this.track(new THREE.BufferGeometry());
     geo.setAttribute('position', new THREE.Float32BufferAttribute(points, 3));
-    const mat = this.track(new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.8, depthTest: true }));
+    // Debug lines draw on top of everything so colliders under props stay visible.
+    const mat = this.track(new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.85, depthTest: false }));
     const l = new THREE.LineSegments(geo, mat);
+    l.renderOrder = 19;
     l.name = name;
     return l;
   }

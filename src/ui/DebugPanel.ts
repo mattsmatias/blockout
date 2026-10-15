@@ -58,7 +58,7 @@ export class DebugPanel {
     const flags: Array<[DevFlag, string]> = [
       ['grid', 'Ruudukko'],
       ['colliders', 'Törmäykset'],
-      ['anchors', 'Ankkuri'],
+      ['anchors', 'Ankkurit + footprintit'],
       ['cameraBounds', 'Kamerarajat'],
     ];
     const flagRow = this.el.querySelector('.dev-flags')!;
@@ -200,8 +200,22 @@ export class DebugPanel {
       t ? `player     x ${t.x.toFixed(2)} z ${t.z.toFixed(2)} · tile ${tile!.tx},${tile!.tz}` : '',
       p ? `speed      ${Math.hypot(p.motion.vx, p.motion.vz).toFixed(2)} m/s${p.motion.running ? ' (run)' : ''}` : '',
       `chunks     ${this.game.worldView.chunkCount}`,
+      ...this.collisionLines(),
     ];
     this.stats.textContent = lines.filter(Boolean).join('\n');
+  }
+
+  private collisionLines(): string[] {
+    const c = this.game.collisionDebug();
+    if (!c) return [];
+    const lines = [
+      `world      x ${c.x.toFixed(2)}  z ${c.z.toFixed(2)}`,
+      `törmäys    ${c.blocked ? 'KYLLÄ: ' + c.contacts.join(', ') : 'ei'}`,
+      `syvyys     pelaaja ${c.depth.toFixed(2)}`,
+    ];
+    if (c.nearest)
+      lines.push(`           ${c.nearest.prop} ${c.nearest.propDepth.toFixed(2)} → pelaaja ${c.nearest.inFront ? 'EDESSÄ' : 'TAKANA'}`);
+    return lines;
   }
 
   dispose(): void {

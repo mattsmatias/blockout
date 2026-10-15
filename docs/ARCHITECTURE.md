@@ -76,3 +76,21 @@ venytetä tai vinouteta.
 Assettien vaatimus jatkossa: lattian suuntaiset reunat 30° vaakatasosta (tile ≈ 64 × 37 px),
 pystyreunat pystysuoria, läpinäkyvä tausta, sama mittakaava kaikissa kuvissa, ja kääntyville esineille
 neljä isometristä näkymää (istuin/etupuoli ↙, ↘, ↗, ↖).
+
+## Esineiden törmäys ja syvyys
+
+**Törmäys** (`physics/`): pelaajalla on maailmakoordinaateissa oleva ympyrä-collider (säde 0,3 m).
+Esineen collider tulee sen määrittelystä (`PropCatalog`: `collider` = laatikko, ympyrä tai ei mitään),
+ei koskaan PNG-kuvan reunoista. Liike tarkistetaan ennen hyväksymistä: osa-askeleet (≤ ½ säde) estävät
+läpäisyn, lyhin erotus antaa liukumisen, ja ristiriitaisissa tilanteissa (rako kapeampi kuin pelaaja)
+askel hylätään ja yritetään akseli kerrallaan, joten pelaaja ei koskaan jää colliderin sisään.
+
+**Syvyys** (`rendering/PropGeometry.ts`): sprite kuvataan sen footprintin kahdelle kameraa kohti olevalle
+pystytahkolle (+Z ja +X). Jokainen sprite-sarake saa esineen todellisen etupinnan syvyyden siinä kohdassa,
+joten pitkä penkki on pelaajan edessä toisesta päästä ja takana toisesta, kuten 3D-esine. Syvyys tulee
+lattiakoordinaateista, ei kuvan yläreunasta. Pinnat ovat pystysuoria, joten kuva ei veny eikä vinoudu.
+`depth: 'flat'` = maassa oleva kuvio (esim. kaivonkansi), joka piirretään aina hahmojen alle.
+
+**Debug** (?dev=1): "Törmäykset" näyttää kaikki colliderit, "Ankkurit + footprintit" pelaajan colliderin,
+esineiden footprintit ja lattia-ankkurit. Paneelissa: maailmakoordinaatit, törmäystila (mihin colliderin
+pelaaja koskee) ja syvyysarvot (pelaaja vs. lähin esine, edessä/takana).

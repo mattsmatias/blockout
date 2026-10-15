@@ -1,7 +1,7 @@
 import { CollisionWorld } from '../physics/CollisionWorld';
 import type { Rect } from '../rendering/CameraRig';
 import { validateMap, type MapDefinition } from './MapDefinition';
-import { PROP_DEFS, resolveProp } from './props/PropCatalog';
+import { PROP_DEFS, resolveCollider, resolveProp } from './props/PropCatalog';
 
 /**
  * Runtime world built from a MapDefinition. Owns simulation-side data only
@@ -22,11 +22,13 @@ export class World {
     for (const o of def.obstacles) {
       this.collision.add({ id: o.id, minX: o.x, minZ: o.z, maxX: o.x + o.width, maxZ: o.z + o.depth });
     }
+    // Prop colliders come from the prop definition (box/circle/none), never from the sprite.
     def.props.forEach((p, i) => {
-      const d = PROP_DEFS[p.prop]!;
-      if (!d.solid) return;
-      const [fx, fz] = resolveProp(d, p.rot)!.footprint;
-      this.collision.add({ id: `prop-${i}-${p.prop}`, minX: p.x - fx / 2, minZ: p.z - fz / 2, maxX: p.x + fx / 2, maxZ: p.z + fz / 2 });
+      const c = resolveCollider(PROP_DEFS[p.prop]!, p.x, p.z, p.rot);
+      const id = `prop-${i}-${p.prop}`;
+      if (!c) return;
+      if (c.shape === 'circle') this.collision.addCircle(id, c.x, c.z, c.r);
+      else this.collision.add({ id, minX: c.minX, minZ: c.minZ, maxX: c.maxX, maxZ: c.maxZ });
     });
   }
 
@@ -66,11 +68,17 @@ export function validateProps(def: MapDefinition, playerRadius = 0.3): Array<{ m
       if (r.minX < q.maxX && r.maxX > q.minX && r.minZ < q.maxZ && r.maxZ > q.minZ)
         out.push({ message: `prop ${r.name} overlaps prop ${q.name}` });
     }
-    if (r.solid) {
+    const col = resolveCollider(d, p.x, p.z, p.rot);
+    if (col) {
       for (const pt of [...def.spawnPoints, ...def.devPoints]) {
-        const cx = Math.max(r.minX, Math.min(pt.x, r.maxX));
-        const cz = Math.max(r.minZ, Math.min(pt.z, r.maxZ));
-        if ((pt.x - cx) ** 2 + (pt.z - cz) ** 2 < playerRadius ** 2) out.push({ message: `prop ${r.name} blocks point ${pt.id}` });
+        let dist: number;
+        if (col.shape === 'circle') dist = Math.hypot(pt.x - col.x, pt.z - col.z) - col.r;
+        else {
+          const cx = Math.max(col.minX, Math.min(pt.x, col.maxX));
+          const cz = Math.max(col.minZ, Math.min(pt.z, col.maxZ));
+          dist = Math.hypot(pt.x - cx, pt.z - cz);
+        }
+        if (dist < playerRadius) out.push({ message: `prop ${r.name} blocks point ${pt.id}` });
       }
     }
     rects.push(r);

@@ -1,7 +1,7 @@
 /**
  * Static collision on the XZ plane, independent of anything visual.
- * Colliders are axis-aligned boxes in world units. Fading or hiding a wall in
- * the renderer never touches this data.
+ * Colliders are axis-aligned boxes or circles in world units (metres). Fading,
+ * hiding or re-drawing something in the renderer never touches this data.
  */
 
 export interface AABB {
@@ -10,6 +10,8 @@ export interface AABB {
   minZ: number;
   maxX: number;
   maxZ: number;
+  /** When set, the collider is this circle; min/max are then its bounding box. */
+  circle?: { x: number; z: number; r: number };
 }
 
 /** Uniform-grid broadphase. Cell size ≈ 2 tiles keeps buckets tiny for city blocks. */
@@ -34,7 +36,7 @@ export class SpatialHash {
     }
   }
 
-  /** Collects unique boxes overlapping the query rectangle into `out` (cleared first). */
+  /** Collects unique colliders overlapping the query rectangle into `out` (cleared first). */
   query(minX: number, minZ: number, maxX: number, maxZ: number, out: AABB[]): AABB[] {
     out.length = 0;
     const c = this.cellSize;
@@ -51,6 +53,31 @@ export class SpatialHash {
   clear(): void {
     this.cells.clear();
   }
+}
+
+/**
+ * Closest point on a collider to (x, z). For a circle it is on the circle's edge
+ * (or its centre when (x, z) is exactly the centre).
+ */
+export function closestPoint(c: AABB, x: number, z: number): { x: number; z: number; inside: boolean } {
+  if (c.circle) {
+    const dx = x - c.circle.x;
+    const dz = z - c.circle.z;
+    const d = Math.hypot(dx, dz);
+    if (d <= c.circle.r) return { x: c.circle.x, z: c.circle.z, inside: true };
+    return { x: c.circle.x + (dx / d) * c.circle.r, z: c.circle.z + (dz / d) * c.circle.r, inside: false };
+  }
+  const cx = Math.max(c.minX, Math.min(x, c.maxX));
+  const cz = Math.max(c.minZ, Math.min(z, c.maxZ));
+  return { x: cx, z: cz, inside: cx === x && cz === z };
+}
+
+/** Signed gap between a circle (x, z, r) and a collider; negative = overlapping. */
+export function gapTo(c: AABB, x: number, z: number, r: number): number {
+  if (c.circle) return Math.hypot(x - c.circle.x, z - c.circle.z) - c.circle.r - r;
+  const p = closestPoint(c, x, z);
+  if (p.inside) return -r - Math.min(x - c.minX, c.maxX - x, z - c.minZ, c.maxZ - z);
+  return Math.hypot(x - p.x, z - p.z) - r;
 }
 
 export class CollisionWorld {
@@ -71,6 +98,11 @@ export class CollisionWorld {
     this.hash.insert(box);
   }
 
+  addCircle(id: string, x: number, z: number, r: number): void {
+    if (!(r > 0)) throw new Error(`Collider "${id}" has non-positive radius`);
+    this.add({ id, minX: x - r, minZ: z - r, maxX: x + r, maxZ: z + r, circle: { x, z, r } });
+  }
+
   near(x: number, z: number, r: number): AABB[] {
     return this.hash.query(x - r, z - r, x + r, z + r, this.scratch);
   }
@@ -79,14 +111,15 @@ export class CollisionWorld {
   overlaps(x: number, z: number, r: number): boolean {
     const b = this.bounds;
     if (x - r < b.minX || x + r > b.maxX || z - r < b.minZ || z + r > b.maxZ) return true;
-    for (const box of this.near(x, z, r)) {
-      const cx = Math.max(box.minX, Math.min(x, box.maxX));
-      const cz = Math.max(box.minZ, Math.min(z, box.maxZ));
-      const dx = x - cx;
-      const dz = z - cz;
-      if (dx * dx + dz * dz < r * r - 1e-9) return true;
-    }
+    for (const c of this.near(x, z, r)) if (gapTo(c, x, z, r) < -1e-9) return true;
     return false;
+  }
+
+  /** Colliders touching a circle within `tolerance` (for debug display). */
+  contacts(x: number, z: number, r: number, tolerance = 0.02): string[] {
+    const out: string[] = [];
+    for (const c of this.near(x, z, r + tolerance)) if (gapTo(c, x, z, r) <= tolerance) out.push(c.id);
+    return out;
   }
 
   clear(): void {

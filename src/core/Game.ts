@@ -10,6 +10,10 @@ import { registerBrowserLoaders } from '../rendering/AssetLoaders';
 import { IsometricCamera } from '../rendering/IsometricCamera';
 import { PlayerMarkerView } from '../rendering/PlayerMarkerView';
 import { PropLayerView } from '../rendering/PropLayerView';
+import { propDepthAtColumn, viewDepth } from '../rendering/PropGeometry';
+import { worldOffsetToArtPixels } from '../utils/CoordinateUtils';
+
+const worldToArt = (x: number, z: number) => worldOffsetToArtPixels(x, 0, z).px;
 import { PROPS_ATLAS } from '../assets/conceptProps.generated';
 import { Renderer } from '../rendering/Renderer';
 import { WorldView } from '../rendering/WorldView';
@@ -146,7 +150,10 @@ export class Game {
     if (flag === 'grid') this.worldView.debug.grid.visible = value;
     if (flag === 'colliders') this.worldView.debug.colliders.visible = value;
     if (flag === 'cameraBounds') this.worldView.debug.cameraBounds.visible = value;
-    if (flag === 'anchors') this.playerView.anchorDebug.visible = value;
+    if (flag === 'anchors') {
+      this.playerView.anchorDebug.visible = value;
+      if (this.propView) this.propView.debug.visible = value;
+    }
   }
 
   getFlag(flag: DevFlag): boolean {
@@ -191,6 +198,43 @@ export class Game {
     d.tick = this.state.tick;
     d.entities = this.state.entities.size;
     this.onFrame?.(frameDt);
+  }
+
+  /**
+   * Collision and depth state around the player, for the dev panel.
+   * Uses the same functions as the simulation and the renderer.
+   */
+  collisionDebug(): {
+    x: number;
+    z: number;
+    depth: number;
+    contacts: string[];
+    blocked: boolean;
+    nearest: { prop: string; propDepth: number; inFront: boolean } | null;
+  } | null {
+    const p = this.state.get(this.playerId);
+    if (!p) return null;
+    const { x, z } = p.transform;
+    const contacts = this.world.collision.contacts(x, z, p.radius);
+    let nearest: { prop: string; propDepth: number; inFront: boolean; dist: number } | null = null;
+    for (const g of this.propView?.geometries ?? []) {
+      const col = worldToArt(x, z);
+      const d = propDepthAtColumn(g, col);
+      if (d === null || d === -Infinity) continue;
+      const cx = (g.footprint.minX + g.footprint.maxX) / 2;
+      const cz = (g.footprint.minZ + g.footprint.maxZ) / 2;
+      const dist = Math.hypot(cx - x, cz - z);
+      if (dist > 3 || (nearest && nearest.dist < dist)) continue;
+      nearest = { prop: g.prop, propDepth: d, inFront: viewDepth(x, z) > d, dist };
+    }
+    return {
+      x,
+      z,
+      depth: viewDepth(x, z),
+      contacts,
+      blocked: contacts.length > 0,
+      nearest: nearest && { prop: nearest.prop, propDepth: nearest.propDepth, inFront: nearest.inFront },
+    };
   }
 
   countSceneObjects(): number {
